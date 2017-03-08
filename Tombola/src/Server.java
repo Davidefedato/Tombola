@@ -107,10 +107,8 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		System.out.println("Connesso!!!");
-		
 	}
+	
 	//metodi
 	protected void createContents() {
 		// VARIABILI

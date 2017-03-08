@@ -23,11 +23,12 @@ public class ThreadClient extends Thread {
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-			elencoNumeri.add(Integer.parseInt(in.readLine()));
-			System.out.println("Numeri" + elencoNumeri);
+			int i=0;
 			
 			while(!in.readLine().equals("fine")){
 				elencoNumeri.add(Integer.parseInt(in.readLine()));
+				System.out.println("Numeri " + elencoNumeri.get(i));
+				i++;
 			}
 			
 		} catch (IOException e) {
