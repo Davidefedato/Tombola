@@ -6,38 +6,41 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ThreadClient extends Thread {
-	
+	BufferedReader in;
+	PrintWriter out;
 	private Socket s;
 	private Client c;
-	ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
-	
-	//deve essere inizializzato con il socket e con il riferimento della parte grafica
-	public ThreadClient(Socket s, Client c){
+	public ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
+
+	// deve essere inizializzato con il socket e con il riferimento della parte
+	// grafica
+	public ThreadClient(Socket s, Client c) {
 		this.s = s;
 		this.c = c;
 	}
+
+	public ArrayList <Integer> passaNumeri(){
+		return elencoNumeri;
+	}
 	
-	public void run(){
+	public void run() {
 		super.run();
-		//all'infinito resta in ascolto di nuovi messaggi nel socket
+		// all'infinito resta in ascolto di nuovi messaggi nel socket
 		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-			int i=0;
-			
-			while(!in.readLine().equals("fine")){
+			System.out.println(s);
+			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			out = new PrintWriter(s.getOutputStream(), true);
+
+			for (int i = 0; i < 15; i++) {
 				elencoNumeri.add(Integer.parseInt(in.readLine()));
-				System.out.println("Numeri " + elencoNumeri.get(i));
-				i++;
+				System.out.println("CLIENT >> " + elencoNumeri.get(i));
 			}
-			
+			System.out.println(elencoNumeri.size());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		
+
 	}
-	
+
 }

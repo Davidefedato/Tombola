@@ -91,6 +91,7 @@ public class Server {
 				if (!elencoNumeri.contains(n)) {
 					elencoNumeri.add(n);
 					out.println(n);
+					System.out.println("SERVER >> " + n);
 					break;
 				}//if
 			} //while

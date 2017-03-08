@@ -5,11 +5,15 @@ import org.eclipse.swt.widgets.Label;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Text;
+
+import com.ibm.icu.text.SearchIterator.ElementComparisonType;
 
 public class Client {
 
@@ -17,6 +21,9 @@ public class Client {
 	private Socket s;
 	private PrintWriter out;
 	private BufferedReader in;
+	private Text lista;
+	ArrayList <Integer> elenco = new ArrayList<Integer>();
+	ThreadClient tc;
 	
 	public static void main(String[] args) {
 		try {
@@ -51,6 +58,10 @@ public class Client {
 		Label lblNumeri = new Label(shell, SWT.NONE);
 		lblNumeri.setBounds(10, 35, 256, 15);
 		
+		lista = new Text(shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
+		lista.setEditable(false);
+		lista.setBounds(10, 10, 289, 194);
+		
 		Button btnRichiedi = new Button(shell, SWT.NONE);
 		btnRichiedi.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -58,17 +69,30 @@ public class Client {
 				//si connette al server e crea il socket
 				try {
 					s = new Socket("localhost", 9999);
+					tc = new ThreadClient(s, Client.this);
 					//crea un thread di ascolto dei messaggi a cui passer� il socket e la parte grafica
-					ThreadClient tc = new ThreadClient(s, Client.this);
 					tc.start();
-					
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
-		btnRichiedi.setBounds(10, 81, 75, 25);
+		btnRichiedi.setBounds(336, 30, 75, 25);
 		btnRichiedi.setText("Richiedi");
+		
+
+		
+		
+		Button btnPopola = new Button(shell, SWT.NONE);
+		btnPopola.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				elenco = tc.passaNumeri();
+				lista.setText(""+elenco);
+			}
+		});
+		btnPopola.setBounds(336, 72, 75, 25);
+		btnPopola.setText("Popola");
 
 	}
 }
