@@ -58,7 +58,7 @@ public class Client {
 		Label lblNumeri = new Label(shell, SWT.NONE);
 		lblNumeri.setBounds(10, 35, 256, 15);
 		
-		lista = new Text(shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
+		lista = new Text(shell, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		lista.setEditable(false);
 		lista.setBounds(10, 10, 289, 194);
 		
@@ -93,6 +93,36 @@ public class Client {
 		});
 		btnPopola.setBounds(336, 72, 75, 25);
 		btnPopola.setText("Popola");
+		
+		Button btnAmbo = new Button(shell, SWT.NONE);
+		btnAmbo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				out.println("Ambo");
+				for (int i=0; i<elenco.size(); i++){
+					out.println(elenco.get(i));
+				}
+				
+			}
+		});
+		btnAmbo.setBounds(10, 227, 75, 25);
+		btnAmbo.setText("Ambo");
+		
+		Button btnTerna = new Button(shell, SWT.NONE);
+		btnTerna.setBounds(91, 227, 75, 25);
+		btnTerna.setText("Terna");
+		
+		Button btnQuaterna = new Button(shell, SWT.NONE);
+		btnQuaterna.setBounds(172, 227, 75, 25);
+		btnQuaterna.setText("Quaterna");
+		
+		Button btnCinquina = new Button(shell, SWT.NONE);
+		btnCinquina.setBounds(253, 227, 75, 25);
+		btnCinquina.setText("Cinquina");
+		
+		Button btnTombola = new Button(shell, SWT.NONE);
+		btnTombola.setBounds(336, 227, 75, 25);
+		btnTombola.setText("Tombola");
 
 	}
 }

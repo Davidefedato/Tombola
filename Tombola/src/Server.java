@@ -25,6 +25,8 @@ public class Server {
 	PrintWriter out;
 	Socket s;
 	ServerSocket ss;
+	ArrayList <Integer> nr;
+	String messaggio;
 
 	public static void main(String[] args) {
 		try {
@@ -97,6 +99,14 @@ public class Server {
 			} //while
 		}//for
 	}
+	
+	public void numeriVincenti(){
+		int n = 0;
+		for (int i = 1; i<90; i++){
+			n = 1 + ((int) Math.round(Math.random() * 89));
+		}
+		out.println(n);
+	}
 
 	public void connetti(){
 		try {
@@ -108,6 +118,22 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void controllaVincita(){
+		nr = new ArrayList <Integer>();
+		try {
+			messaggio = in.readLine(); //messaggio di ambo/terna/...
+			for (int i=0; i<15; i++){
+				nr.add(Integer.parseInt(in.readLine())); //prende i numeri dal client
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	//metodi
