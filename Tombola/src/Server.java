@@ -92,14 +92,29 @@ public class Server {
 			System.out.println();
 		}
 	}
+	
+	public boolean controllaNumero(ArrayList<Integer> en, int n){
+		int c=0;
+		for(int i=0; i<en.size(); i++){
+			if((n/10)==(en.get(i)/10)){
+				c++;
+			}
+			if(c>=3){
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public void passaScheda(){
 		ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
 		int n;
+		int riga;
+		int colonna;
 		for (int i = 0; i < 15; i++) {
 			while (true) {
 				n = 1 + ((int) Math.round(Math.random() * 89));
-				if (!elencoNumeri.contains(n)) {
+				if (!elencoNumeri.contains(n) && controllaNumero(elencoNumeri, n)) {
 					elencoNumeri.add(n);
 					out.println(n);
 					System.out.println("SERVER >> " + n);
@@ -111,10 +126,21 @@ public class Server {
 	
 	public void numeriVincenti(){
 		int n = 0;
-		for (int i = 1; i<90; i++){
-			n = 1 + ((int) Math.round(Math.random() * 89));
+		ArrayList<Integer> elencoNumeriV = new ArrayList<Integer>();
+		for (int i = 0; i<90; i++){
+			while (true) {
+				n = 1 + ((int) Math.round(Math.random() * 89));
+				if (!elencoNumeriV.contains(n)) {
+					elencoNumeriV.add(n);
+					out.println(n);
+					cancella(n); //passare numero
+					aggiornaLista();
+					break;
+				}//if
+			} //while
 		}
-		out.println(n);
+	
+		
 	}
 
 	public void connetti(){
@@ -161,22 +187,13 @@ public class Server {
 		/*list = new List(shell, SWT.BORDER | SWT.V_SCROLL);
 		list.setBounds(10, 10, 301, 242);*/
 
-		Button btnControlla = new Button(shell, SWT.NONE);
-		btnControlla.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				cancella(10); //passare numero
-				aggiornaLista();
-			}
-		});
-		btnControlla.setBounds(349, 10, 75, 25);
-		btnControlla.setText("Controlla");
 		
 		btnPassa = new Button(shell, SWT.NONE);
 		btnPassa.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 					passaScheda();
+					numeriVincenti();
 			}
 		});
 		btnPassa.setBounds(359, 84, 75, 25);

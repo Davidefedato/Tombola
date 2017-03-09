@@ -23,7 +23,11 @@ public class Client {
 	private BufferedReader in;
 	private Text lista;
 	ArrayList <Integer> elenco = new ArrayList<Integer>();
+	ArrayList <Integer> elencoV = new ArrayList<Integer>();
 	ThreadClient tc;
+	private Text listaV;
+	int v;
+	
 	
 	public static void main(String[] args) {
 		try {
@@ -49,6 +53,26 @@ public class Client {
 		}
 	}
 
+	public void popolaLista(){
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				elenco = tc.passaNumeri();
+				lista.setText(""+elenco);
+			}
+		});
+	}
+	
+	public void listaVincenti(){
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				 v = tc.passaNumeriV();
+				 elencoV.add(v);
+				listaV.setText(""+elencoV);
+			}
+		});
+	}
 	
 	protected void createContents() {
 		shell = new Shell();
@@ -58,9 +82,9 @@ public class Client {
 		Label lblNumeri = new Label(shell, SWT.NONE);
 		lblNumeri.setBounds(10, 35, 256, 15);
 		
-		lista = new Text(shell, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
+		lista = new Text(shell, SWT.BORDER | SWT.READ_ONLY | SWT.MULTI);
 		lista.setEditable(false);
-		lista.setBounds(10, 10, 289, 194);
+		lista.setBounds(10, 10, 320, 38);
 		
 		Button btnRichiedi = new Button(shell, SWT.NONE);
 		btnRichiedi.addSelectionListener(new SelectionAdapter() {
@@ -70,7 +94,7 @@ public class Client {
 				try {
 					s = new Socket("localhost", 9999);
 					tc = new ThreadClient(s, Client.this);
-					//crea un thread di ascolto dei messaggi a cui passer� il socket e la parte grafica
+					//crea un thread di ascolto dei messaggi a cui passerà il socket e la parte grafica
 					tc.start();
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -80,19 +104,6 @@ public class Client {
 		btnRichiedi.setBounds(336, 30, 75, 25);
 		btnRichiedi.setText("Richiedi");
 		
-
-		
-		
-		Button btnPopola = new Button(shell, SWT.NONE);
-		btnPopola.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				elenco = tc.passaNumeri();
-				lista.setText(""+elenco);
-			}
-		});
-		btnPopola.setBounds(336, 72, 75, 25);
-		btnPopola.setText("Popola");
 		
 		Button btnAmbo = new Button(shell, SWT.NONE);
 		btnAmbo.addSelectionListener(new SelectionAdapter() {
@@ -123,6 +134,9 @@ public class Client {
 		Button btnTombola = new Button(shell, SWT.NONE);
 		btnTombola.setBounds(336, 227, 75, 25);
 		btnTombola.setText("Tombola");
+		
+		listaV = new Text(shell, SWT.BORDER);
+		listaV.setBounds(10, 77, 320, 38);
 
 	}
 }
