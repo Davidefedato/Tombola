@@ -1,7 +1,9 @@
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.List;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +16,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 public class Server {
 
@@ -29,6 +33,8 @@ public class Server {
 	String messaggio;
 	private ArrayList<ServerThread> st = new ArrayList<ServerThread>();
 	private ArrayList<PrintWriter> pw = new ArrayList<PrintWriter>();
+	Label [][] tabellone; 
+	private Text text;
 
 	public static void main(String[] args) {
 		try {
@@ -37,6 +43,7 @@ public class Server {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 
 	/**
@@ -141,7 +148,6 @@ public class Server {
 	//metodi
 	protected void createContents() {
 		// VARIABILI
-		int i, j;
 		int nr = 9;
 		int nc = 10;
 		int contatore = 1;
@@ -152,8 +158,8 @@ public class Server {
 		shell.setSize(450, 300);
 		shell.setText("SWT Application");
 
-		list = new List(shell, SWT.BORDER | SWT.V_SCROLL);
-		list.setBounds(10, 10, 301, 242);
+		/*list = new List(shell, SWT.BORDER | SWT.V_SCROLL);
+		list.setBounds(10, 10, 301, 242);*/
 
 		Button btnControlla = new Button(shell, SWT.NONE);
 		btnControlla.addSelectionListener(new SelectionAdapter() {
@@ -176,19 +182,36 @@ public class Server {
 		btnPassa.setBounds(359, 84, 75, 25);
 		btnPassa.setText("Passa");
 
-		for (i = 0; i < nr; i++) {
-			for (j = 0; j < nc; j++) {
+		
+		tabellone = new Label[nr][nc];
+		int x=10, y=10;
+		for(int i=0; i<nr; i++){
+			for(int j=0; j<nc; j++){
+				tabellone[i][j] = new Label(shell, SWT.CENTER);
+				tabellone[i][j].setBounds(x,y,20,20);
+				tabellone[i][j].setText("X");
+				tabellone[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_CYAN));
+				
+				x+=22;
+				if(x>=220){
+					y+=22;
+					x = 10;
+				}
+				
+			}
+		}
+
+		for (int i = 0; i < nr; i++) {
+			for (int j = 0; j < nc; j++) {
 				matrice[i][j] = Integer.toString(contatore);
 				System.out.print(matrice[i][j] + " ");
 				riga = riga + " " + matrice[i][j];
 				contatore++;
 			}
 
-			list.add(riga);
+			//list.add(riga);
 			riga = "";
 			System.out.println();
 		}
-
-		connetti();
 	}//createContents
 }
