@@ -10,7 +10,9 @@ public class ThreadClient extends Thread {
 	PrintWriter out;
 	private Socket s;
 	private Client c;
+	int v;
 	public ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
+
 
 	// deve essere inizializzato con il socket e con il riferimento della parte
 	// grafica
@@ -23,6 +25,10 @@ public class ThreadClient extends Thread {
 		return elencoNumeri;
 	}
 	
+	public int passaNumeriV(){
+		return v;
+	}
+	
 	public void run() {
 		super.run();
 		// all'infinito resta in ascolto di nuovi messaggi nel socket
@@ -30,12 +36,15 @@ public class ThreadClient extends Thread {
 			System.out.println(s);
 			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			out = new PrintWriter(s.getOutputStream(), true);
-
 			for (int i = 0; i < 15; i++) {
 				elencoNumeri.add(Integer.parseInt(in.readLine()));
 				System.out.println("CLIENT >> " + elencoNumeri.get(i));
 			}
-			System.out.println(elencoNumeri.size());
+			c.popolaLista();
+			while(true){
+				v = Integer.parseInt(in.readLine());
+				c.listaVincenti();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
