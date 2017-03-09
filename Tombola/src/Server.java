@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 public class Server {
-
 	protected Shell shell;
 	List list;
 	private String[][] matrice;
@@ -29,13 +28,12 @@ public class Server {
 	PrintWriter out;
 	Socket s;
 	ServerSocket ss;
-	ArrayList <Integer> nr;
+	ArrayList<Integer> nr;
 	String messaggio;
 	private ArrayList<ServerThread> st = new ArrayList<ServerThread>();
 	private ArrayList<PrintWriter> pw = new ArrayList<PrintWriter>();
-	Label [][] tabellone; 
+	Label[][] tabellone;
 	private Text text;
-
 	public static void main(String[] args) {
 		try {
 			Server window = new Server();
@@ -62,7 +60,7 @@ public class Server {
 	}
 
 	// METODI
-	public void cancella(int n) {//passare numero
+	public void cancella(int n) {// passare numero
 		int i, j;
 		int nr = 9;
 		int nc = 10;
@@ -82,31 +80,29 @@ public class Server {
 		int nr = 9;
 		int nc = 10;
 		String riga = "";
-		list.removeAll();
 		for (i = 0; i < nr; i++) {
 			for (j = 0; j < nc; j++) {
 				riga = riga + " " + matrice[i][j];
 			}
-			list.add(riga);
 			riga = "";
 			System.out.println();
 		}
 	}
-	
-	public boolean controllaNumero(ArrayList<Integer> en, int n){
-		int c=0;
-		for(int i=0; i<en.size(); i++){
-			if((n/10)==(en.get(i)/10)){
+
+	public boolean controllaNumero(ArrayList<Integer> en, int n) {
+		int c = 0;
+		for (int i = 0; i < en.size(); i++) {
+			if ((n / 10) == (en.get(i) / 10)) {
 				c++;
 			}
-			if(c>=3){
+			if (c >= 3) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public void passaScheda(){
+	public void passaScheda() {
 		ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
 		int n;
 		int riga;
@@ -116,34 +112,70 @@ public class Server {
 				n = 1 + ((int) Math.round(Math.random() * 89));
 				if (!elencoNumeri.contains(n) && controllaNumero(elencoNumeri, n)) {
 					elencoNumeri.add(n);
-					out.println(n);
+					for(int j=0; j<pw.size(); j++){
+						pw.get(j).println(n);
+					}
 					System.out.println("SERVER >> " + n);
 					break;
-				}//if
-			} //while
-		}//for
+				} // if
+			} // while
+		} // for
 	}
 	
-	public void numeriVincenti(){
-		int n = 0;
-		ArrayList<Integer> elencoNumeriV = new ArrayList<Integer>();
-		for (int i = 0; i<90; i++){
-			while (true) {
-				n = 1 + ((int) Math.round(Math.random() * 89));
-				if (!elencoNumeriV.contains(n)) {
-					elencoNumeriV.add(n);
-					out.println(n);
-					cancella(n); //passare numero
-					aggiornaLista();
-					break;
-				}//if
-			} //while
-		}
-	
-		
+	public boolean getNumero(int n){
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				for(int i=0; i<9; i++){
+					for(int j=0; j<10; j++){
+						if(Integer.parseInt(tabellone[i][j].getText()) == n){
+							tabellone[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+							i = 10;
+							break;
+						}
+					}
+				}
+			}
+		});
+		return false;
 	}
 
-	public void connetti(){
+	public void numeriVincenti() {
+		Thread t = null;
+		t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				int n = 0;
+				ArrayList<Integer> elencoNumeriV = new ArrayList<Integer>();
+				for (int i = 0; i < 90; i++) {
+					while (true) {
+						n = 1 + ((int) Math.round(Math.random() * 89));
+						if (!elencoNumeriV.contains(n)) {
+							System.out.println("SERVER >> numero vincente: " + n);
+							elencoNumeriV.add(n);
+							getNumero(n);
+							for(int j=0; j<pw.size(); j++){
+								pw.get(j).println(n);
+							}
+							cancella(n); // passare numero
+							aggiornaLista();
+							break;
+						} // if
+					} // while
+					try {
+						t.sleep(3000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		}
+		});
+		t.start();
+	}
+
+	public void connetti() {
+		System.out.println("SERER >> In attesa di giocatori");
 		try {
 			ss = new ServerSocket(9999);
 			s = ss.accept();
@@ -156,22 +188,23 @@ public class Server {
 			e.printStackTrace();
 		}
 	}
-	
-	public void controllaVincita(){
-		nr = new ArrayList <Integer>();
+
+	public void controllaVincita() {
+		nr = new ArrayList<Integer>();
 		try {
-			messaggio = in.readLine(); //messaggio di ambo/terna/...
-			for (int i=0; i<15; i++){
-				nr.add(Integer.parseInt(in.readLine())); //prende i numeri dal client
+			messaggio = in.readLine(); // messaggio di ambo/terna/...
+			for (int i = 0; i < 15; i++) {
+				nr.add(Integer.parseInt(in.readLine())); // prende i numeri dal
+															// client
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	//metodi
+
+	// metodi
 	protected void createContents() {
 		// VARIABILI
 		int nr = 9;
@@ -181,40 +214,38 @@ public class Server {
 		String riga = "";
 		//
 		shell = new Shell();
-		shell.setSize(450, 300);
+		shell.setSize(450, 484);
 		shell.setText("SWT Application");
 
-		/*list = new List(shell, SWT.BORDER | SWT.V_SCROLL);
-		list.setBounds(10, 10, 301, 242);*/
+		/*
+		 * list = new List(shell, SWT.BORDER | SWT.V_SCROLL); list.setBounds(10,
+		 * 10, 301, 242);
+		 */
 
-		
 		btnPassa = new Button(shell, SWT.NONE);
 		btnPassa.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-					passaScheda();
-					numeriVincenti();
+				passaScheda();
+				numeriVincenti();
 			}
 		});
-		btnPassa.setBounds(359, 84, 75, 25);
+		btnPassa.setBounds(10, 221, 75, 25);
 		btnPassa.setText("Passa");
 
-		
 		tabellone = new Label[nr][nc];
-		int x=10, y=10;
-		for(int i=0; i<nr; i++){
-			for(int j=0; j<nc; j++){
+		int x = 10, y = 10, c =1;
+		for (int i = 0; i < nr; i++) {
+			for (int j = 0; j < nc; j++) {
 				tabellone[i][j] = new Label(shell, SWT.CENTER);
-				tabellone[i][j].setBounds(x,y,20,20);
-				tabellone[i][j].setText("X");
+				tabellone[i][j].setBounds(x, y, 20, 20);
+				tabellone[i][j].setText(Integer.toString(c++));
 				tabellone[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_CYAN));
-				
-				x+=22;
-				if(x>=220){
-					y+=22;
+				x += 22;
+				if (x >= 220) {
+					y += 22;
 					x = 10;
 				}
-				
 			}
 		}
 
@@ -226,9 +257,18 @@ public class Server {
 				contatore++;
 			}
 
-			//list.add(riga);
+			// list.add(riga);
 			riga = "";
 			System.out.println();
 		}
-	}//createContents
+		
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				connetti();
+				
+			}
+		});
+		t.start();
+	}// createContents
 }

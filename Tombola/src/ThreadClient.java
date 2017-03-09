@@ -10,23 +10,24 @@ public class ThreadClient extends Thread {
 	PrintWriter out;
 	private Socket s;
 	private Client c;
-	int v;
-	public ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
-
+	public ArrayList<Integer> elencoNumeri;
+	public ArrayList<Integer> numeriVincenti;
 
 	// deve essere inizializzato con il socket e con il riferimento della parte
 	// grafica
-	public ThreadClient(Socket s, Client c) {
+	public ThreadClient(Socket s, Client c, ArrayList<Integer> elencoNumeri, ArrayList<Integer> numeriVincenti) {
 		this.s = s;
 		this.c = c;
+		this.elencoNumeri = elencoNumeri;
+		this.numeriVincenti = numeriVincenti;
 	}
 
 	public ArrayList <Integer> passaNumeri(){
 		return elencoNumeri;
 	}
 	
-	public int passaNumeriV(){
-		return v;
+	public ArrayList<Integer> passaNumeriV(){
+		return numeriVincenti;
 	}
 	
 	public void run() {
@@ -41,9 +42,11 @@ public class ThreadClient extends Thread {
 				System.out.println("CLIENT >> " + elencoNumeri.get(i));
 			}
 			c.popolaLista();
+			System.out.println("CLIENT >> In attesa dei numeri");
 			while(true){
-				v = Integer.parseInt(in.readLine());
-				c.listaVincenti();
+				int v = Integer.parseInt(in.readLine());
+				c.getNumero(v);
+				System.out.println("CLIENT >> Ricevuto: " + v);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
