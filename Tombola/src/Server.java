@@ -27,6 +27,8 @@ public class Server {
 	ServerSocket ss;
 	ArrayList <Integer> nr;
 	String messaggio;
+	private ArrayList<ServerThread> st = new ArrayList<ServerThread>();
+	private ArrayList<PrintWriter> pw = new ArrayList<PrintWriter>();
 
 	public static void main(String[] args) {
 		try {
@@ -140,6 +142,8 @@ public class Server {
 			s = ss.accept();
 			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 			out = new PrintWriter(s.getOutputStream(), true);
+			st.add(new ServerThread(Server.this, in, s));
+			pw.add(out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +157,6 @@ public class Server {
 			for (int i=0; i<15; i++){
 				nr.add(Integer.parseInt(in.readLine())); //prende i numeri dal client
 			}
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
