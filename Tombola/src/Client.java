@@ -30,7 +30,13 @@ public class Client {
 	ThreadClient tc;
 	int v;
 	private Label[][] cartella;
-	
+	private Text txtNome;
+	private Text txtIP;
+	Button btnAmbo;
+	Button btnTerna;
+	Button btnQuaterna;
+	Button btnCinquina;
+	Button btnTombola;
 	public static void main(String[] args) {
 		try {
 			Client window = new Client();
@@ -102,18 +108,61 @@ public class Client {
 		return false;
 	}
 	
-	public int checkNumero(){
+	public boolean checkNumero(String s){
 		int n = 0;
+		int riga[] = new int[3];
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 10; j++) {
 				if (!cartella[i][j].getText().equals("") && elencoV.contains(Integer.parseInt(cartella[i][j].getText()))) {
-					n++;
-					return n;
+					System.out.println("numero vincente trovato: " + i);
+					//n++;
+					riga[i]++;
 				}
 			}
-			n = 0;
 		}
-		return n;
+		if(s.equals("AMBO")){
+			for(int i=0; i<3; i++){
+				if(riga[i] == 2){
+					btnAmbo.setEnabled(false);
+					return true;
+				}
+			}
+			return false;
+		}else if(s.equals("TERNA")){
+			for(int i=0; i<3; i++){
+				if(riga[i] == 3){
+					btnTerna.setEnabled(false);
+					return true;
+				}
+			}
+			return false;
+		}else if(s.equals("QUATERNA")){
+			for(int i=0; i<3; i++){
+				if(riga[i] == 4){
+					btnQuaterna.setEnabled(false);
+					return true;
+				}
+			}
+			return false;
+		}else if(s.equals("CINQUINA")){
+			for(int i=0; i<3; i++){
+				if(riga[i] == 5){
+					btnCinquina.setEnabled(false);
+					return true;
+				}
+			}
+			return false;
+		}else if(s.equals("TOMBOLA")){
+			for(int i=0; i<3; i++){
+				if(riga[i] == 15){
+					btnTombola.setEnabled(false);
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		return false;
 	}
 	
 	protected void createContents() {
@@ -132,6 +181,8 @@ public class Client {
 				try {
 					s = new Socket("localhost", 9999);
 					tc = new ThreadClient(s, Client.this, elenco, elencoV);
+					out = new PrintWriter(s.getOutputStream(), true);
+					out.println(txtNome.getText());
 					//crea un thread di ascolto dei messaggi a cui passerà il socket e la parte grafica
 					tc.start();
 				} catch (Exception e1) {
@@ -139,18 +190,18 @@ public class Client {
 				}
 			}
 		});
-		btnRichiedi.setBounds(336, 30, 75, 25);
+		btnRichiedi.setBounds(336, 98, 75, 25);
 		btnRichiedi.setText("Connetti");
 		
 		
-		Button btnAmbo = new Button(shell, SWT.NONE);
+		btnAmbo = new Button(shell, SWT.NONE);
 		btnAmbo.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(checkNumero() == 2){
+				if(checkNumero("AMBO")){
 					out.println("AMBO");
 					punteggio += 10;
-					System.out.println("CLIET >> Hai fatto AMBO");
+					System.out.println("CLIENT >> Hai fatto AMBO");
 				}else{
 					System.out.println("CLIENT >> Dove lo vedi ambo??? COGLIONE!!!");
 					
@@ -161,21 +212,91 @@ public class Client {
 		btnAmbo.setBounds(10, 227, 75, 25);
 		btnAmbo.setText("Ambo");
 		
-		Button btnTerna = new Button(shell, SWT.NONE);
+		btnTerna = new Button(shell, SWT.NONE);
+		btnTerna.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(checkNumero("TERNA")){
+					out.println("TERNA");
+					punteggio += 10;
+					System.out.println("CLIENT >> Hai fatto TERNA");
+				}else{
+					System.out.println("CLIENT >> Dove lo vedi TERNA??? COGLIONE!!!");
+					
+				}
+				
+			}
+		});
 		btnTerna.setBounds(91, 227, 75, 25);
 		btnTerna.setText("Terna");
 		
-		Button btnQuaterna = new Button(shell, SWT.NONE);
+		btnQuaterna = new Button(shell, SWT.NONE);
+		btnQuaterna.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(checkNumero("QUATERNA")){
+					out.println("QUATERNA");
+					punteggio += 10;
+					System.out.println("CLIENT >> Hai fatto QUATERNA");
+				}else{
+					System.out.println("CLIENT >> Dove lo vedi QUATERNA??? COGLIONE!!!");
+					
+				}
+				
+			}
+		});
 		btnQuaterna.setBounds(172, 227, 75, 25);
 		btnQuaterna.setText("Quaterna");
 		
-		Button btnCinquina = new Button(shell, SWT.NONE);
+		btnCinquina = new Button(shell, SWT.NONE);
+		btnCinquina.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(checkNumero("CINQUINA")){
+					out.println("CINQUINA");
+					punteggio += 10;
+					System.out.println("CLIENT >> Hai fatto CINQUINA");
+				}else{
+					System.out.println("CLIENT >> Dove lo vedi CINQUINA??? COGLIONE!!!");
+					
+				}
+				
+			}
+		});
 		btnCinquina.setBounds(253, 227, 75, 25);
 		btnCinquina.setText("Cinquina");
 		
-		Button btnTombola = new Button(shell, SWT.NONE);
+		btnTombola = new Button(shell, SWT.NONE);
+		btnTombola.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(checkNumero("TOMBOLA")){
+					out.println("TOMBOLA");
+					punteggio += 10;
+					System.out.println("CLIENT >> Hai fatto TOMBOLA");
+				}else{
+					System.out.println("CLIENT >> Niente TOMBOLA...");
+					
+				}
+				
+			}
+		});
 		btnTombola.setBounds(336, 227, 75, 25);
 		btnTombola.setText("Tombola");
+		
+		Label lblNome = new Label(shell, SWT.NONE);
+		lblNome.setBounds(273, 10, 55, 15);
+		lblNome.setText("Nome");
+		
+		txtNome = new Text(shell, SWT.BORDER);
+		txtNome.setBounds(335, 7, 76, 21);
+		
+		Label lblIpServer = new Label(shell, SWT.NONE);
+		lblIpServer.setBounds(273, 54, 55, 15);
+		lblIpServer.setText("IP Server");
+		
+		txtIP = new Text(shell, SWT.BORDER);
+		txtIP.setBounds(335, 54, 76, 21);
 		
 		cartella = new Label[3][10];
 		int x = 10, y = 10, c =1;
@@ -184,24 +305,6 @@ public class Client {
 				cartella[i][j] = new Label(shell, SWT.CENTER);
 				cartella[i][j].setBounds(x, y, 20, 20);
 				cartella[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_CYAN));
-				cartella[i][j].addMouseListener(new MouseListener() {
-					@Override
-					public void mouseDoubleClick(MouseEvent arg0) {
-						cartella[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-					}
-
-					@Override
-					public void mouseDown(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-
-					@Override
-					public void mouseUp(MouseEvent arg0) {
-						// TODO Auto-generated method stub
-						
-					}
-				});;
 				x += 22;
 				if (x >= 220) {
 					y += 40;

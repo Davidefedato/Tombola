@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -18,6 +20,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 public class Server {
 	protected Shell shell;
@@ -27,13 +32,19 @@ public class Server {
 	BufferedReader in;
 	PrintWriter out;
 	Socket s;
+	int id = 0;
 	ServerSocket ss;
 	ArrayList<Integer> nr;
 	String messaggio;
 	private ArrayList<ServerThread> st = new ArrayList<ServerThread>();
 	private ArrayList<PrintWriter> pw = new ArrayList<PrintWriter>();
+	ArrayList<Giocatore> giocatori = new ArrayList<Giocatore>();
+	ArrayList<TableItem> ti = new ArrayList<TableItem>();
 	Label[][] tabellone;
 	private Text text;
+	Thread t1;
+	private Table table;
+
 	public static void main(String[] args) {
 		try {
 			Server window = new Server();
@@ -41,7 +52,7 @@ public class Server {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -104,15 +115,18 @@ public class Server {
 
 	public void passaScheda() {
 		ArrayList<Integer> elencoNumeri = new ArrayList<Integer>();
+		t1.interrupt();
+		createTable();
+		for (int i = 0; i < st.size(); i++) {
+			st.get(i).start();
+		}
 		int n;
-		int riga;
-		int colonna;
 		for (int i = 0; i < 15; i++) {
 			while (true) {
 				n = 1 + ((int) Math.round(Math.random() * 89));
 				if (!elencoNumeri.contains(n) && controllaNumero(elencoNumeri, n)) {
 					elencoNumeri.add(n);
-					for(int j=0; j<pw.size(); j++){
+					for (int j = 0; j < pw.size(); j++) {
 						pw.get(j).println(n);
 					}
 					System.out.println("SERVER >> " + n);
@@ -121,14 +135,14 @@ public class Server {
 			} // while
 		} // for
 	}
-	
-	public boolean getNumero(int n){
+
+	public boolean getNumero(int n) {
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				for(int i=0; i<9; i++){
-					for(int j=0; j<10; j++){
-						if(Integer.parseInt(tabellone[i][j].getText()) == n){
+				for (int i = 0; i < 9; i++) {
+					for (int j = 0; j < 10; j++) {
+						if (Integer.parseInt(tabellone[i][j].getText()) == n) {
 							tabellone[i][j].setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
 							i = 10;
 							break;
@@ -151,10 +165,9 @@ public class Server {
 					while (true) {
 						n = 1 + ((int) Math.round(Math.random() * 89));
 						if (!elencoNumeriV.contains(n)) {
-							System.out.println("SERVER >> numero vincente: " + n);
 							elencoNumeriV.add(n);
 							getNumero(n);
-							for(int j=0; j<pw.size(); j++){
+							for (int j = 0; j < pw.size(); j++) {
 								pw.get(j).println(n);
 							}
 							cancella(n); // passare numero
@@ -168,25 +181,80 @@ public class Server {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				}
+				finePartita();
 			}
-		}
 		});
 		t.start();
 	}
 
-	public void connetti() {
-		System.out.println("SERER >> In attesa di giocatori");
-		try {
-			ss = new ServerSocket(9999);
-			s = ss.accept();
-			in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-			out = new PrintWriter(s.getOutputStream(), true);
-			st.add(new ServerThread(Server.this, in, s));
-			pw.add(out);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public void finePartita(){
+		giocatori.sort(new Comparator<Giocatore>() {
+
+			@Override
+			public int compare(Giocatore o1, Giocatore o2) {
+				// TODO Auto-generated method stub
+				return o1.getPunti() - o2.getPunti();
+			}
+		});
+		for(int i=0; i<pw.size(); i++){
+			pw.get(i).println("WINNER:" + giocatori.get(0));
 		}
+	}
+
+	public void updateTable() {
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for (int i = 0; i < giocatori.size(); i++) {
+					table.getItem(i).setText(new String[] { giocatori.get(i).getNome(),
+							Integer.toString(giocatori.get(i).getPunti()), giocatori.get(i).getPremi().toString() });
+				}
+			}
+		});
+	}
+
+	public void updatePlayer(Giocatore g) {
+		giocatori.set(g.getId(), g);
+		updateTable();
+	}
+
+	public void connetti() throws IOException {
+		System.out.println("SERER >> In attesa di giocatori");
+		ss = new ServerSocket(9999);
+		t1 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						s = ss.accept();
+						in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+						out = new PrintWriter(s.getOutputStream(), true);
+						String nome = in.readLine();
+						Giocatore g = new Giocatore(nome, 0, id);
+						giocatori.add(g);
+						st.add(new ServerThread(Server.this, in, s, g));
+						pw.add(out);
+						id++;
+						System.out.println("SERVER >> Si è connesso " + g.getNome());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		t1.start();
+	}
+
+	public void createTable() {
+		for (int i = 0; i < giocatori.size(); i++) {
+			ti.add(new TableItem(table, SWT.CENTER));
+			ti.get(i).setText(
+					new String[] { giocatori.get(i).getNome(), Integer.toString(giocatori.get(i).getPunti()), "" });
+		}
+		updateTable();
 	}
 
 	public void controllaVincita() {
@@ -233,8 +301,22 @@ public class Server {
 		btnPassa.setBounds(10, 221, 75, 25);
 		btnPassa.setText("Passa");
 
+		table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		table.setBounds(10, 257, 275, 178);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		TableColumn tc = new TableColumn(table, SWT.CENTER);
+		tc.setText("Giocatore");
+		tc.setWidth(80);
+		TableColumn tc1 = new TableColumn(table, SWT.CENTER);
+		tc1.setText("Punteggio");
+		tc1.setWidth(80);
+		TableColumn tc2 = new TableColumn(table, SWT.CENTER);
+		tc2.setText("Premi");
+		tc2.setWidth(100);
+
 		tabellone = new Label[nr][nc];
-		int x = 10, y = 10, c =1;
+		int x = 10, y = 10, c = 1;
 		for (int i = 0; i < nr; i++) {
 			for (int j = 0; j < nc; j++) {
 				tabellone[i][j] = new Label(shell, SWT.CENTER);
@@ -261,12 +343,17 @@ public class Server {
 			riga = "";
 			System.out.println();
 		}
-		
+
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				connetti();
-				
+				try {
+					connetti();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
 		});
 		t.start();

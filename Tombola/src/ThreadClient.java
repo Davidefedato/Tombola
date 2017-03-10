@@ -39,14 +39,20 @@ public class ThreadClient extends Thread {
 			out = new PrintWriter(s.getOutputStream(), true);
 			for (int i = 0; i < 15; i++) {
 				elencoNumeri.add(Integer.parseInt(in.readLine()));
-				System.out.println("CLIENT >> " + elencoNumeri.get(i));
+				//System.out.println("CLIENT >> " + elencoNumeri.get(i));
 			}
 			c.popolaLista();
 			System.out.println("CLIENT >> In attesa dei numeri");
 			while(true){
-				int v = Integer.parseInt(in.readLine());
-				c.getNumero(v);
-				System.out.println("CLIENT >> Ricevuto: " + v);
+				String s1 = in.readLine();
+				if(s1.charAt(0) <=57 && s1.charAt(0) >=48){
+					int v = Integer.parseInt(s1);
+					numeriVincenti.add(v);
+					c.getNumero(v);
+					System.out.println("CLIENT >> Ricevuto: " + v);
+				}else{
+					System.out.println("CLIENT >> Ricevuto: " + s1);
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
