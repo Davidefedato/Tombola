@@ -198,7 +198,7 @@ public class Server {
 			}
 		});
 		for(int i=0; i<pw.size(); i++){
-			pw.get(i).println("WINNER:" + giocatori.get(0));
+			pw.get(i).println("WINNER:" + giocatori.get(0).getNome() + ":");
 		}
 	}
 
