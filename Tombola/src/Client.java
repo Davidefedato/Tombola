@@ -179,7 +179,7 @@ public class Client {
 			public void widgetSelected(SelectionEvent e) {
 				//si connette al server e crea il socket
 				try {
-					s = new Socket("localhost", 9999);
+					s = new Socket(txtIP.getText(), 9999);
 					tc = new ThreadClient(s, Client.this, elenco, elencoV);
 					out = new PrintWriter(s.getOutputStream(), true);
 					out.println(txtNome.getText());
